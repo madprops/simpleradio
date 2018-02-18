@@ -379,7 +379,7 @@ function activate_key_detection()
 				toggle_audio()
 			}
 
-			else if(e.key === "Enter")
+			else if(e.key === "Escape")
 			{
 				show_history()
 			}
