@@ -374,7 +374,7 @@ function activate_key_detection()
 	{
 		if(!modal_open)
 		{
-			if(e.key === " ")
+			if(e.key === " " || e.key === "Enter")
 			{
 				toggle_audio()
 			}
