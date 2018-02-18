@@ -6,9 +6,14 @@
 
 		<link rel='shortcut icon' href='favicon.ico?v=1' type='image/x-icon'> 
 
-		<link rel="stylesheet" href="style.css?v=5">
-		<script src="jquery.min.js"></script>
-		<script src="base.js?v=5"></script>
+		<link rel="stylesheet" href="style.css?v=6">
+
+		<script src="jquery.min.js?v=1"></script>
+		<script src="msg.min.js?v=1"></script>
+		<script src="dateformat.js?v=1"></script>
+		<script src="nicescroll.min.js?v=1"></script>
+		
+		<script src="base.js?v=6"></script>
 
 		<script>
 			$(function()
@@ -37,6 +42,8 @@
 					<span id="volume_display">Volume: 100%</span>
 					<span id="volume_up" class="pointer" onclick="volume_up()">+</span>
 				</span>
+
+				<span id="history" class="pointer" onclick="show_history()">History</span>
 
 			</div>
 

@@ -33,6 +33,7 @@ body, html
 #np_title
 {
 	font-size: 2em;
+	font-weight: bold;
 }
 
 #np_artist
@@ -70,4 +71,58 @@ body, html
 {
 	padding-left: 1.4em;
 	display: none;
+}
+
+#history
+{
+	padding-left: 1.4em;
+}
+
+.history_item_container
+{
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
+
+.history_item
+{
+	display: inline-block;
+}
+
+.history_item_title
+{
+	font-size: 1.4em;
+	font-weight: bold;
+}
+
+.history_item_artist
+{
+	font-size: 1.2em;
+	padding-top: 0.2em;
+}
+
+#Msg-window-history
+{
+	width: 30em !important;
+}
+
+#Msg-content-history
+{
+	font-size: 1em !important;
+}
+
+.filter_input
+{
+	top: 0px;
+	width: 16em;
+	border: 1px solid grey;
+	font-size: 1.2em;
+	text-align: center;
+	position: sticky;
+}
+
+.spacer1
+{
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
 }

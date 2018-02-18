@@ -1,12 +1,22 @@
 const radio_url = "https://hue.merkoba.com:8765/wok3n"
 const metadata_url = "https://hue.merkoba.com:8765/status-json.xsl"
 const metadata_interval = 12000
+const max_history_length = 1000
+
 var current_title = ""
 var current_artist = ""
+var history_filtered = false
+var modal_open = false
+
+var msg_history
 
 function init()
 {
 	activate_volume_scroll()
+	start_msg()
+	start_history_events()
+	activate_key_detection()
+
 	get_metadata()
 	start_metadata_loop()
 }
@@ -75,6 +85,7 @@ function show_now_playing(title, artist="")
 		else
 		{
 			$("#np_artist").css("padding-top", "0.5em")
+			push_to_history(title, artist)
 		}
 
 		current_title = title
@@ -84,7 +95,7 @@ function show_now_playing(title, artist="")
 
 function toggle_audio()
 {
-	if($("#audio")[0].paused)
+	if($("#audio_toggle").text() === "Play")
 	{
 		$("#audio").attr("src", radio_url)
 		$("#audio_toggle").text("Stop")
@@ -168,8 +179,256 @@ function activate_volume_scroll()
 	})
 }
 
-function search_song()
+function search_song(data=false)
 {
-	var q = encodeURIComponent(`"${current_title}" by "${current_artist}"`)
+	if(data)
+	{
+		var q = encodeURIComponent(`"${data.title}" by "${data.artist}"`)
+	}
+
+	else
+	{
+		var q = encodeURIComponent(`"${current_title}" by "${current_artist}"`)
+	}
+
 	window.open(`https://www.google.com/search?q=${q}`, "_blank")
+}
+
+function start_msg()
+{
+	msg_history = Msg.factory(
+	{
+		id: "history",
+		class: "black",
+		clear_editables: true,
+		after_show: function(instance)
+		{
+			$("#history_filter").focus()
+			after_modal_show(instance)
+			after_modal_set_or_show(instance)
+		},
+		after_set: function(instance)
+		{
+			after_modal_set_or_show(instance)
+		},
+		after_close: function(instance)
+		{
+			reset_history_filter()
+			after_modal_close(instance)
+		}
+	})
+
+	var s = `
+	<div>
+		<input type="text" id="history_filter" class="filter_input" placeholder="Filter">
+		<div class="spacer1"></div>
+		<div id="history_container"></div>
+	</div>`
+
+	msg_history.set(s)
+
+	$("#history_filter").on("input", function()
+	{
+		history_filter_timer()
+	})
+}
+
+function show_history()
+{
+	msg_history.show()
+}
+
+function push_to_history(title, artist)
+{
+	var s = `
+	<div class="history_item_container">
+		<span class="history_item pointer" title="${nice_date()}">
+			<div class="history_item_title">${title}</div>
+			<div class="history_item_artist">${artist}</div>
+		</span>
+	<div>`
+
+	$("#history_container").prepend(s)
+
+	var els = $('#history_container').children()
+
+	if(els.length > max_history_length)
+	{
+		els.last().remove()		
+	}
+
+	if(history_filtered)
+	{
+		do_history_filter()
+	}
+
+	update_modal_scrollbar("history")
+}
+
+function nice_date(date=Date.now())
+{
+	return dateFormat(date, "dddd, mmmm dS, yyyy, h:MM:ss TT")
+}
+
+function start_history_events()
+{
+	$("#history_container").on("click", ".history_item", function() 
+	{
+		var title = $(this).find(".history_item_title").eq(0).text()
+		var artist = $(this).find(".history_item_artist").eq(0).text()
+		
+		search_song({title:title, artist:artist})
+	})
+}
+
+var history_filter_timer = (function() 
+{
+	var timer 
+
+	return function() 
+	{
+		clearTimeout(timer)
+
+		timer = setTimeout(function() 
+		{
+			do_history_filter()
+		}, 350)
+	}
+})()
+
+function do_history_filter()
+{
+	var filter = $("#history_filter").val().trim().toLowerCase()
+
+	if(filter !== "")
+	{
+		history_filtered = true
+
+		$(".history_item").each(function()
+		{
+			$(this).parent().css("display", "block")
+
+			var title = $(this).find(".history_item_title").eq(0).text()
+			var artist = $(this).find(".history_item_artist").eq(0).text()
+
+			var include = false
+
+			if(title.toLowerCase().indexOf(filter) !== -1)
+			{
+				include = true
+			}
+
+			else if(artist.toLowerCase().indexOf(filter) !== -1)
+			{
+				include = true
+			}
+
+			if(!include)
+			{
+				$(this).parent().css("display", "none")
+			}
+		})
+	}
+
+	else
+	{
+		history_filtered = false
+
+		$(".history_item").each(function()
+		{
+			$(this).parent().css("display", "block")
+		})
+	}
+
+	update_modal_scrollbar("history")
+
+	$('#Msg-content-container-history').scrollTop(0)
+}
+
+function reset_history_filter()
+{
+	$("#history_filter").val("")
+	do_history_filter()
+}
+
+function start_modal_scrollbar(s)
+{
+	$(`#Msg-content-container-${s}`).niceScroll
+	({
+		zindex: 9999999,
+		autohidemode: false,
+		cursorcolor: "#AFAFAF",
+		cursorborder: "0px solid white",
+		cursorwidth: "7px"	
+	})
+}
+
+function update_modal_scrollbar(s)
+{
+	$(`#Msg-content-container-${s}`).getNiceScroll().resize()	
+}
+
+function activate_key_detection()
+{
+	$(document).keyup(function(e)
+	{
+		if(!modal_open)
+		{
+			if(e.key === " ")
+			{
+				toggle_audio()
+			}
+
+			else if(e.key === "Enter")
+			{
+				show_history()
+			}
+		}
+	})
+
+	$(document).keydown(function(e)
+	{
+		if(!modal_open)
+		{
+			if(e.key === "ArrowUp")
+			{
+				if($("#audio_toggle").text() === "Stop")
+				{
+					volume_up()
+				}
+			}
+
+			else if(e.key === "ArrowDown")
+			{
+				if($("#audio_toggle").text() === "Stop")
+				{
+					volume_down()
+				}
+			}
+		}
+	})
+
+}
+
+function after_modal_show(instance)
+{
+	modal_open = true
+}
+
+function after_modal_set_or_show(instance)
+{
+	update_modal_scrollbar(instance.options.id)
+
+	setTimeout(function()
+	{
+		instance.content_container.scrollTop = 0
+	}, 100)
+}
+
+function after_modal_close(instance)
+{
+	if(!msg_history.any_open())
+	{
+		modal_open = false
+	}
 }
