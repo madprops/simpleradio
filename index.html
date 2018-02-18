@@ -1,0 +1,49 @@
+<html>
+
+	<head>
+
+		<title>Radio Wok3n</title>
+
+		<link rel='shortcut icon' href='favicon.ico?v=1' type='image/x-icon'> 
+
+		<link rel="stylesheet" href="style.css?v=5">
+		<script src="jquery.min.js"></script>
+		<script src="base.js?v=5"></script>
+
+		<script>
+			$(function()
+			{
+				init()
+			})			
+		</script>
+
+	</head>
+
+	<body>
+
+		<div id="main">
+
+			<div id="now_playing" onclick="search_song()" class='pointer'>
+				<div id="np_title">Loading Metadata</div>
+				<div id="np_artist"></div>
+			</div>
+
+			<div id="controls" class="unselectable">
+
+				<span id="audio_toggle" class="pointer" onclick="toggle_audio()">Play</span>
+
+				<span id="volume_area">
+					<span id="volume_down" class="pointer" onclick="volume_down()">-</span>
+					<span id="volume_display">Volume: 100%</span>
+					<span id="volume_up" class="pointer" onclick="volume_up()">+</span>
+				</span>
+
+			</div>
+
+		</div>
+
+		<audio id='audio' autoplay></audio>
+
+	</body>
+
+</html>
