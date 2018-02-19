@@ -201,6 +201,10 @@ function start_msg()
 		id: "history",
 		class: "black",
 		clear_editables: true,
+		after_create: function(instance)
+		{
+			after_modal_create(instance)
+		},
 		after_show: function(instance)
 		{
 			$("#history_filter").focus()
@@ -231,6 +235,34 @@ function start_msg()
 	{
 		history_filter_timer()
 	})
+}
+
+function after_modal_create(instance)
+{
+	start_modal_scrollbar(instance.options.id)
+}
+
+function after_modal_show(instance)
+{
+	modal_open = true
+}
+
+function after_modal_set_or_show(instance)
+{
+	update_modal_scrollbar(instance.options.id)
+
+	setTimeout(function()
+	{
+		instance.content_container.scrollTop = 0
+	}, 100)
+}
+
+function after_modal_close(instance)
+{
+	if(!msg_history.any_open())
+	{
+		modal_open = false
+	}
 }
 
 function show_history()
@@ -408,27 +440,4 @@ function activate_key_detection()
 		}
 	})
 
-}
-
-function after_modal_show(instance)
-{
-	modal_open = true
-}
-
-function after_modal_set_or_show(instance)
-{
-	update_modal_scrollbar(instance.options.id)
-
-	setTimeout(function()
-	{
-		instance.content_container.scrollTop = 0
-	}, 100)
-}
-
-function after_modal_close(instance)
-{
-	if(!msg_history.any_open())
-	{
-		modal_open = false
-	}
 }
