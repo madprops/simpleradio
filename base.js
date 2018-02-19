@@ -17,7 +17,7 @@ function init()
 	start_history_events()
 	activate_key_detection()
 
-	get_metadata()
+	get_metadata(true)
 	start_metadata_loop()
 }
 
@@ -29,7 +29,7 @@ function start_metadata_loop()
 	}, metadata_interval)
 }
 
-function get_metadata()
+function get_metadata(first=false)
 {
 	$.get(metadata_url,
 	{
@@ -45,6 +45,32 @@ function get_metadata()
 			{
 				metadata_error()
 				return false
+			}
+
+			if(first)
+			{
+				const tracklist = source.playlist.trackList
+
+				var n = 0
+
+				for(var track of tracklist)
+				{
+					if(track !== null)
+					{
+						if(source.artist !== track.creator && source.title !== track.title)
+						{
+							push_to_history(track.title, track.creator, "Played before radio was loaded")
+							
+							n += 1
+						}
+
+					}
+
+					if(n === 10)
+					{
+						break
+					}
+				}
 			}
 
 			show_now_playing(source.title, source.artist)
@@ -72,7 +98,7 @@ function show_now_playing(title, artist="")
 {
 	var s = `${title} - ${artist}`
 
-	if(title !== current_title && artist !== current_artist)
+	if(title !== current_title || artist !== current_artist)
 	{
 		$("#np_title").text(title)
 		$("#np_artist").text(artist)
@@ -270,11 +296,21 @@ function show_history()
 	msg_history.show()
 }
 
-function push_to_history(title, artist)
+function push_to_history(title, artist, xtitle=false)
 {
+	if(xtitle)
+	{
+		var t = xtitle
+	}
+
+	else
+	{
+		var t = nice_date()
+	}
+
 	var s = `
 	<div class="history_item_container">
-		<span class="history_item pointer" title="${nice_date()}">
+		<span class="history_item pointer" title="${t}">
 			<div class="history_item_title">${title}</div>
 			<div class="history_item_artist">${artist}</div>
 		</span>
