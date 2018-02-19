@@ -2,6 +2,10 @@ const radio_url = "https://hue.merkoba.com:8765/wok3n"
 const metadata_url = "https://hue.merkoba.com:8765/status-json.xsl"
 const metadata_interval = 12000
 const max_history_length = 1000
+const max_initial_playlist = 10
+
+// This requires Icecast 2.5.x 
+const get_initial_playlist = true
 
 var current_title = ""
 var current_artist = ""
@@ -17,7 +21,7 @@ function init()
 	start_history_events()
 	activate_key_detection()
 
-	get_metadata(true)
+	get_metadata(get_initial_playlist)
 	start_metadata_loop()
 }
 
@@ -29,7 +33,7 @@ function start_metadata_loop()
 	}, metadata_interval)
 }
 
-function get_metadata(first=false)
+function get_metadata(get_initial_playlist=false)
 {
 	$.get(metadata_url,
 	{
@@ -47,7 +51,7 @@ function get_metadata(first=false)
 				return false
 			}
 
-			if(first)
+			if(get_initial_playlist)
 			{
 				const tracklist = source.playlist.trackList
 
@@ -66,7 +70,7 @@ function get_metadata(first=false)
 
 					}
 
-					if(n === 10)
+					if(n === max_initial_playlist)
 					{
 						break
 					}
