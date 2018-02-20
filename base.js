@@ -429,7 +429,7 @@ function start_modal_scrollbar(s)
 	({
 		zindex: 9999999,
 		autohidemode: false,
-		cursorcolor: "#AFAFAF",
+		cursorcolor: "#6c6c6c",
 		cursorborder: "0px solid white",
 		cursorwidth: "7px"	
 	})

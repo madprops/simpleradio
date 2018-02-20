@@ -91,19 +91,20 @@ body, html
 
 .history_item_title
 {
-	font-size: 1.4em;
+	font-size: 1.2em;
 	font-weight: bold;
 }
 
 .history_item_artist
 {
-	font-size: 1.2em;
+	font-size: 1em;
 	padding-top: 0.2em;
 }
 
 #Msg-window-history
 {
 	width: 30em !important;
+	color: #e2e2e2 !important;
 }
 
 #Msg-content-history
